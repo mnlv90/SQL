@@ -56,3 +56,24 @@ ORDER BY stock_quantity ASC;
 SELECT item_name, stock_quantity
 FROM superstore
 WHERE item_name = 'Wireless Earbuds';
+
+--All items in the Electronics category that have a price greater than $50, average rating of 4.3 or higher. 
+SELECT item_name, price, stock_quantity, average_rating
+FROM superstore
+WHERE category = "Electronics"
+AND price > 50
+AND average_rating > 4.3;
+
+-- Write a query that returns the total number of items in stock, average price, and average rating for each category in the superstore.
+SELECT category, sum(stock_quantity) AS 'Sum Quanitity', avg(price) AS 'Average Price', avg(average_rating) AS 'Average Rating'
+FROM superstore
+GROUP BY category;
+
+--Identify all items where the stock quantity is below the average stock across the entire store.
+SELECT item_name, category, price, stock_quantity, average_rating
+FROM superstore
+WHERE stock_quantity < 
+	(SELECT avg(stock_quantity)
+     FROM superstore
+     );
+
