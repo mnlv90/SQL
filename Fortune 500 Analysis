@@ -59,20 +59,82 @@ VALUES
 
 
 
---Find which company provides 12 or more maternity leave weeks with healthcare benefits. 
+--1. Retrieve the company name, industry, and revenue for companies in the Technology or Healthcare industries that also have more than 2,500 employees.
+
+SELECT company_name, 
+industry,
+revenue
+FROM fortune_companies
+WHERE industry IN  ('Technology' , 'Healthcare')
+AND employees > 2500
+;
+
+
+--2. List each company’s name, revenue, and revenue per employee (revenue divided by employees) as a new column named revenue_per_employee.
+
+SELECT
+	company_name,
+    revenue,
+    SUM (revenue/employees) AS revenue_per_employee
+FROM fortune_companies
+Group by company_name;
+
+
+--3. Show each company’s name and a new column called benefit_level that is:
+--"Full Benefits" if healthcare_benefits = 1 and paid_time_off_days ≥ 20
+--"Partial Benefits" if healthcare_benefits = 1 but paid_time_off_days < 20
+--"No Benefits" if healthcare_benefits = 0
+
+SELECT
+	company_name,
+    CASE WHEN healthcare_benefits = 1 
+    		AND paid_time_off_days >= 20
+        	THEN "Full Benefits"
+        WHEN healthcare_benefits = 1 
+        	AND paid_time_off_days < 20
+        	THEN "Partial Benefits"
+        WHEN healthcare_benefits = 0 THEN "No Benefits"
+     END AS benefit_level
+FROM fortune_companies
+;
+
+
+--4. For each industry, find the average maternity_leave_weeks, but only include industries where the average is at least 12 weeks.
+
+SELECT
+	industry,
+    AVG (maternity_leave_weeks)
+FROM fortune_companies
+GROUP BY industry
+HAVING AVG (maternity_leave_weeks) >= 12
+;
+
+
+--5. Find all industries where the total revenue from companies offering healthcare benefits is more than $500 billion, and show the total revenue for each as total_rev_with_benefits.
+
+SELECT
+	industry,
+    SUM(revenue) AS total_rev_with_benefits
+FROM fortune_companies
+WHERE healthcare_benefits =1
+GROUP BY industry
+HAVING total_rev_with_benefits >= 500
+;
+
+--6. Find which company provides 12 or more maternity leave weeks with healthcare benefits. 
 SELECT company_name, maternity_leave_weeks, healthcare_benefits
 FROM fortune_companies
 WHERE maternity_leave_weeks >= 12 AND healthcare_benefits = 1
 ORDER BY maternity_leave_weeks desc;
 
 
---Which industries have an average revenue of at least $250 billion, and what are their average revenues.
+--7. Which industries have an average revenue of at least $250 billion, and what are their average revenues.
 SELECT industry, ROUND (avg(revenue),1) as avg_revenue
 FROM fortune_companies
 GROUP BY industry
 HAVING avg_revenue >= 250;
 
-# Assign all the companies in the Healthcare industry as "Great", "OK", or "Bad" based on the maternity leave offered. 
+--8. Assign all the companies in the Healthcare industry as "Great", "OK", or "Bad" based on the maternity leave offered. 
 SELECT company_name,
 CASE 
   WHEN maternity_leave_weeks >= 10 THEN 'Great'
@@ -83,12 +145,17 @@ FROM fortune_companies
 WHERE industry='Healthcare';
 
 
---Show the average employees for the industries without duplicate industries
+--9. Show the average employees for the industries without duplicate industries
 SELECT distinct industry, ROUND (avg(employees),1) AS avg_employees
 FROM fortune_companies
 GROUP BY industry;
 
---Show the companies that do not have healthcare benefits
+--10. Show the companies that do not have healthcare benefits
 SELECT company_name, industry
 FROM fortune_companies
 WHERE healthcare_benefits NOT IN (1);
+
+
+
+
+
