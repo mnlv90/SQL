@@ -1,0 +1,99 @@
+Climate Conference Project
+Database: https://www.db-fiddle.com/f/pxMci1sLL945KHKYvpe9W6/1
+
+--LEFT JOIN : List all VIPs and their hotel names, showing even those who don’t have a reservation.
+SELECT 
+	vips.last_name
+    , vips.first_name
+    , hotels.hotel_name
+FROM vips
+LEFT JOIN reservations 
+ON vips.member_id = reservations.member_id
+	left join hotels
+     ON reservations.hotel = hotels.hotel_id
+;
+
+-- Inner Join : Show all VIPs who are presenting at an event, along with the event name and type.
+SELECT 
+	v.last_name
+    , v.first_name
+    , e.event_name
+    , e.event_type
+FROM vips v
+INNER JOIN events e
+ON v.event = e.event_id
+ORDER BY v.last_name
+;
+
+
+-- Multiple JOINs : Display VIPs, the events they’re presenting at, and the hotel they’re staying in (include only those with reservations).
+SELECT 
+	v.last_name
+    , v.first_name
+    , e.event_name
+    , e.event_type
+    , h.hotel_name
+FROM vips v
+INNER JOIN events e
+ON v.event = e.event_id
+INNER JOIN reservations r
+ON v.member_id = r.member_id
+INNER JOIN hotels h
+ON r.hotel = h.hotel_id
+ORDER BY v.last_name, v.first_name
+;
+
+
+-- SELF JOIN : Identify pairs of VIPs where one provided feedback to the other, showing both their names.
+SELECT 
+	a.last_name AS provided_feedback
+    , a.first_name AS provided_feedback
+    , b.last_name AS got_feedback
+    ,b.first_name AS got_feedback
+FROM vips a
+ JOIN vips b
+ON a.member_id = b.provides_feedback_to
+;
+
+
+-- Aggregated query: Count how many VIPs RSVP’d “yes” to the welcome party and “yes” to the thank-you dinner.
+SELECT 
+	SUM (CASE WHEN r.welcome_rsvp = 1 THEN 1 ELSE 0 END) AS welcome_yes,
+    SUM (CASE WHEN r.dinner_rsvp = 1 THEN 1 ELSE 0 END) AS dinner_yes,
+    SUM (CASE WHEN r.Welcome_rsvp = 1 AND r.dinner_Rsvp = 1 THEN 1 ELSE 0 END) AS both_yes
+FROM vips v
+LEFT JOIN reservations r
+ON r.member_id = v.member_id;
+
+
+-- Find all government VIPs who joined after 2010 and are attending an event.
+SELECT 
+	v.last_name
+    , v.first_name
+    , v.association
+    , v.member_since
+    , e.event_name
+    , e.event_type
+FROM vips v
+INNER JOIN events e
+ON v.event = e.event_id
+WHERE v.member_since > 2010
+AND v.assoc_type = 'government'
+ORDER BY v.last_name, v.first_name
+;
+
+
+
+-- List all hotels with the number of VIPs staying in each one, sorted by most guests first.
+SELECT 
+	h.hotel_name
+    , COUNT (r.member_id) AS total_vips
+FROM hotels h
+LEFT JOIN reservations r
+ON h.hotel_id = r.hotel
+GROUP BY h.hotel_name
+ORDER BY total_vips desc
+;
+
+
+
