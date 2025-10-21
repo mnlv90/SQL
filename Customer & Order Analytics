@@ -69,3 +69,45 @@ WHERE orderdate like '02/18/19%';
 SELECT orderdate
 FROM BIT_DB.FebSales
 WHERE orderdate between '02/13/19 00:00' AND '02/18/19 00:00';
+
+--How many of each type of headphone were sold in February? What is the sum of the quantity of products sold that have "headphones" in the name from the February dataset? Group the results by product.
+SELECT Product, SUM(quantity) AS Total
+FROM BIT_DB.FebSales
+WHERE Product LIKE '%headphones%'
+AND length (orderid) = 6 AND orderid <> 'Order ID'
+GROUP BY Product;
+
+
+--What was the average amount spent per account in February? What is the average amount spent / numbers of accounts, not the amount spent by each account.
+SELECT AVG(quantity*price) AS Avg_spent
+FROM BIT_DB.FebSales f
+LEFT JOIN BIT_DB.customers c
+ON f.orderID = c.order_id
+WHERE length (orderid) = 6 AND orderid <> 'Order ID';
+
+
+--Find order ids from Geogia (GA) where the order has an average price greater than $1,000. Only find orders from dates beginning with '04/1'. Assume that the dates are stored in the MM/DD/YY HH:MM format. 
+SELECT orderID, AVG(price)
+FROM AprSales
+WHERE location LIKE '%GA%' 
+AND orderdate LIKE '04/1%'
+AND length (orderid) = 6 AND orderid <> 'Order ID'
+Group by orderID
+Having avg(price) > 1000;
+
+
+--You've been given the following results from the MaySales table. Can you reverse engineer a SQL query that returns these results? 
+SELECT location, orderID
+FROM MaySales
+WHERE orderID LIKE '1943_5'
+AND length (orderid) = 6 AND orderid <> 'Order ID'
+ORDER BY orderID
+LIMIT 10;
+
+
+--Which product brought in the most revenue in January and how much revenue did it bring in total? Show the one product that generated the most revenue (revenue being equivalent to quantity of an item multiplied by the item's price. 
+SELECT product, SUM(quantity*price) AS Rev
+FROM JanSales
+GROUP BY product
+ORDER BY SUM(quantity*price) desc
+LIMIT 1;
