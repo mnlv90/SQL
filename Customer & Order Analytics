@@ -53,3 +53,19 @@ WHERE Feb.Quantity>2
 AND length(orderid) = 6
 AND orderid <> 'Order ID';
 
+--Find the specific date and time 
+SELECT location 
+FROM BIT_DB.FebSales
+WHERE orderdate = '02/18/19 01:35';
+
+
+--Find the specific date but any time
+SELECT sum(quantity)
+FROM BIT_DB.FebSales
+WHERE orderdate like '02/18/19%';
+
+
+-- Find the date between two dates range
+SELECT orderdate
+FROM BIT_DB.FebSales
+WHERE orderdate between '02/13/19 00:00' AND '02/18/19 00:00';
